@@ -28,13 +28,17 @@ class World(object):
         self.goals.append(start)
         self.goals.append(end)
     
-    def draw(self, size=(600, 900, 3)):
+    def draw(self,grown=False, size=(600, 900, 3)):
         img = np.zeros(size)
         thickness = 2
+        
         for i, obstacle in enumerate(self.obstacles):
             if i > 0:
                 thickness = 1
-            img += obstacle.draw(size, thickness)
+                print 'obstacle' + str(i)
+                img += obstacle.draw(grown, size,thickness, color=(0, 255, 0))
+            img += obstacle.draw(False, size,thickness)
+        
         cv2.imshow('world', img)
         cv2.waitKey(0)
 
@@ -47,4 +51,4 @@ class World(object):
 
 if __name__ == '__main__':
     W = World('../input_files/hw4_world_and_obstacles_convex.txt', '../input_files/hw4_start_goal.txt')
-    W.draw()
+    W.draw(grown=True)
