@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import math
-
 def find_convex_hull(pts_array):
 
     num_pts = len(pts_array);
