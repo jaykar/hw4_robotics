@@ -77,11 +77,36 @@ class World(object):
         self.make_edges()
         self.path = ['start']
         self.path.extend(self.graph.shortest_path())
+        #self.get_matlab_instructions('1')
+    def position_nodes(self, coord):
+        x, y = coord
+        a = np.eye(4)
+        theta = np.arctan2(y, x)
+        rot = np.array([ [np.cos(theta) , np.sin(theta), 0.0] ,\
+                         [-np.sin(theta), np.cos(theta), 0.0] ,\
+                         [0.0           , 0.0          , 1.0] ,\
+                         ])
+        a[:3, :3] = rot
+        a[0, 3]   = x
+        a[1, 3]   = y
+        return a
 
     def get_matlab_instructions(self, text_file):
-        len_path = len(self.path)
-        for i in range(len_path - 1):
-            
+        # x,y = self.info[self.path[0]]
+        # prev = np.eye(4)
+        # prev[0, 3]   = x
+        # prev[1, 3]   = y
+        prev_angle = 0
+        for i in range(len(self.path) - 1):
+            curr = self.info[ self.path[i] ]
+            x0, y0 = curr
+            next = self.info[ self.path[i+1] ]
+            x1, y1 = next
+            theta = np.arctan2(y1 - y0, x1 - x0) - prev_angle
+            prev_angle = theta
+            print "rotate", (theta - (np.pi/2))*180/np.pi
+            print "move", np.sqrt((y1 - y0)**2 + (x1 - x0)**2 )
+
     def intialize_graph(self):
         count = 0
         graph = Graph()

@@ -5,16 +5,18 @@ import cv2
 from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
 import math
+
+import math
+
 def find_convex_hull(pts_array):
     num_pts = len(pts_array);
-    print "points array", pts_array
     
     # find the rightmost, lowest point, label it P0
     sorted_pts = sorted(pts_array, key=lambda element: (element[0], -element[1]))
     P0 = sorted_pts.pop()
-    print P0
-    P0_x = P0[0];
-    P0_y = P0[1];
+    print(P0)
+    P0_x = P0[0]
+    P0_y = P0[1]
     
     # sort all points angularly about P0
     # Break ties in favor of closeness to P0
@@ -23,17 +25,17 @@ def find_convex_hull(pts_array):
     for i in range(num_pts-1):
         x = pts_array[i][0]
         y = pts_array[i][1]
-        angle = 0.0;
+        angle = 0
         x_diff = x - P0_x
         y_diff = y - P0_y
-        angle = math.degrees(math.atan2(y_diff, x_diff));
+        angle = math.degrees(math.atan2(y_diff, x_diff))
         if angle < 0:
             angle = angle * (-1) + 180
         dist = math.degrees(math.sqrt(x_diff**2 + y_diff**2));
         pt_info = (round(angle, 3), round(dist,3), pts_array[i])
         sort_array.append(pt_info)
     sorted_pts = sorted(sort_array, key=lambda element: (element[0], element[1]))
-    print sorted_pts
+    print(sorted_pts)
     # Push the points labeled PN−1 and P0 onto a stack. T
     # these points are guaranteed to be on the Convex Hull
     pt_stack = []
@@ -45,44 +47,31 @@ def find_convex_hull(pts_array):
     # If Pi is strictly left of the line formed by top 2 stack entries (Ptop, Ptop−1), 
     # then Push Pi onto the stack and increment i; else Pop the stack (remove Ptop).    
     i = 1
-    while i < num_pts - 2:
-        P_i = sorted_pts[i][2];
-        c = pt_stack.pop();
-        d = pt_stack.pop();
-        print P_i, c, d
-        pt_stack.append(d);
-        pt_stack.append(c);
+    while i < num_pts - 1:
+        P_i = sorted_pts[i][2]
+        c = pt_stack.pop()
+        d = pt_stack.pop()
+        pt_stack.append(d)
+        pt_stack.append(c)
         # find the line formed by these two points and see if the point Pi is
         # strictly to the left of this line
         is_to_the_left = False
-        if c[0] != d[0]: # not a vertical line in conventional xy plane
-            m = (c[1] - d[1])/(c[0] - d[0])
-            b = c[1] - m*(c[0])
-            
-            print "c,d", c, d
-            print(m, b)
+        position = (d[0] - c[0]) * (P_i[1] - c[1]) - (d[1] - c[1]) * (P_i[0] - c[0]) 
+        if position < 0:
+            is_to_the_left = True
 
-            if m == 0: 
-                if (P_i[0] < min(c[0], d[0])):
-                    is_to_the_left = True
-            else:
-                x_line = (P_i[1] - b)/m
-                if P_i[0] < x_line:
-                    is_to_the_left = True
-        else: 
-            if P_i[0] < c[0]:
-                is_to_the_left = True
-        print is_to_the_left
-        if is_to_the_left:
-            pt_stack.append(P_i);
+        if (is_to_the_left):
+            pt_stack.append(P_i)
             i += 1;
         else:
-            pt_stack.pop();
-        print "revised stack:"
-        print pt_stack
-        print '\n'
-    return pt_stack;
-
+            pt_stack.pop()
+    return pt_stack[:-1]
+# #pts = [[0.0, 1.0], [1.0, 5.0], [2.0, 3.0], [2.0, 3.0], [3.0, 5.0], [3.0, 2.0], [4.0, 2.0], [6.0, 3.0]];
+# #pts = [[-0.111, -1.374], [-0.111, -2.174], [-0.911, -1.374], [-0.911, -2.174], [-0.111, -1.843], [-0.111, -2.643], [-0.911, -1.843], [-0.911, -2.643], [0.699, -1.843], [0.699, -2.643], [-0.101, -1.843], [-0.101, -2.643], [0.699, -1.374], [0.699, -2.174], [-0.101, -1.374], [-0.101, -2.174]]                    
+# pts = [[1.588, -1.373], [1.588, -2.173], [0.788, -1.373], [0.788, -2.173], [1.588, -1.843], [1.588, -2.643], [0.788, -1.843], [0.788, -2.643], [1.118, -1.843], [1.118, -2.643], [0.318, -1.843], [0.318, -2.643], [1.118, -1.373], [1.118, -2.173], [0.318, -1.373], [0.318, -2.173]]
+# hull = find_convex_hull(pts);      
+# print(hull)       
+         
 
 class Line(object):
     def __init__(self, start, end):
@@ -224,16 +213,20 @@ class Obstacle(object):
         for coord in coords:
             x, y = coord
             coords_round.append([round(x, 3), round(y,3)])
-        #coords = find_convex_hull(coords_round)
+        
         coords = coords_round
+        #print "obstacle", coords
 
-        coords = np.array(coords) 
-        hull = ConvexHull(coords)
-        x = coords[hull.vertices,0]
-        y = coords[hull.vertices,1]
-        coords = []
-        for (a, b) in zip(x,y):
-            coords.append([a,b])
+        coords = find_convex_hull(coords_round)
+        
+        #coords = np.array(coords) 
+        #hull = ConvexHull(coords)
+        #x = coords[hull.vertices,0]
+        # y = coords[hull.vertices,1]
+        # coords = []
+
+        # for (a, b) in zip(x,y):
+        #    coords.append([a,b])
         return coords
     
     def draw(self, grown=False, size=(600, 900, 3), thickness=1, color =(0, 0, 255)):
