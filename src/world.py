@@ -24,11 +24,47 @@ class Graph():
         self.nodes[a][b] = weight
         self.nodes[b][a] = weight
 
-    def shortest_path(self, source, dest):
-        visited = set()
-        queue = [source]
-        visited.add(source)
-        dist = 0
+    def shortest_path(self):
+        s = 'start'
+        e = 'end'
+        return self.djikstra(self.nodes, s, e)
+
+    def djikstra(self, nodes, S, G):
+        #nodes = graph.nodes
+        unvisited = set(nodes.keys())
+        unvisited.remove(S)
+
+        # initialize distance dictionary    
+        dist = {}
+        predecessors = {}
+        dist[S] = 0;
+        predecessors[S] = S
+        S_neighbors = set(nodes[S].keys());
+        for n in unvisited:
+            if n in S_neighbors:
+                dist[n] = nodes[S][n]
+                predecessors[n] = S
+            else:
+                dist[n] = float('Inf');
+      
+        while len(unvisited) > 0:
+            # find the closest unvisited node        
+            keys = unvisited.intersection(set(dist.keys()))
+            dist_of_unvisited = {k:dist[k] for k in keys}
+            V = min(dist_of_unvisited, key = dist_of_unvisited.get);
+            unvisited.remove(V);
+            V_neighbors = set(nodes[V].keys())
+            for W in V_neighbors:
+                if ((dist[V] + nodes[V][W]) < dist[W]):
+                    dist[W] = dist[V] + nodes[V][W]
+                    predecessors[W] = V           
+        path = []
+        end = G;
+        while end != S:
+            path.append(end)
+            end = predecessors[end]
+        path.reverse()
+        return path
 
 class World(object):
 
@@ -39,7 +75,13 @@ class World(object):
         self.populate_goal(goal_txt)
         self.info, self.graph, self.all_lines = self.intialize_graph()
         self.make_edges()
+        self.path = ['start']
+        self.path.extend(self.graph.shortest_path())
 
+    def get_matlab_instructions(self, text_file):
+        len_path = len(self.path)
+        for i in range(len_path - 1):
+            
     def intialize_graph(self):
         count = 0
         graph = Graph()
@@ -81,24 +123,7 @@ class World(object):
                     x1, y1 = self.info[next_node]
                     weight = np.sqrt( (x0-x1)**2 + (y0 - y1)**2 )
                     self.graph.add_edge(curr_node, next_node, weight)
-        
-        # for i in range(n_nodes - 1):
-        #     curr_node = nodes[i]
-        #     for next_node in ['1_2', '1_1', '1_0']:
-        #         #next_node = nodes[j]
-        #         print str(curr_node) + " -> " + str(next_node)
-        #         curr_line = Line(self.info[curr_node], self.info[next_node])
-        #         obs_n = next_node[0]
-        #         obs_l = curr_node[0]
-
-        #         ret = curr_line.intersect(self.all_lines)
-        #         print ret
-        #         print ""
-        #         if not ret:
-        #             self.graph.add_edge(curr_node, next_node, 1.0)
-        
-
-        print self.graph.nodes
+    
     def populate_obstacles(self, txt_file):
         with open(txt_file, 'r') as input_file:
             n_lines = int(next(input_file))
@@ -140,13 +165,22 @@ class World(object):
         cv2.circle(img, start, radius = 5, color=(0,0,255)) 
         cv2.circle(img, end, radius = 5, color=(0,255,0)) 
 
-        for key in self.graph.nodes:
+        #for key in self.graph.nodes:
+        #    curr = self.info[key]
+        #    start = pixel_location(curr)
+        #    for key2 in self.graph.nodes[key]:
+        #        next = self.info[key2]
+        #        end = pixel_location(next)
+        #        cv2.line(img, start, end, color=(255,0,0), thickness=1)
+
+        path = self.path
+        for i in range(len(path) -1):
+            key, key2 = path[i], path[i+1]
             curr = self.info[key]
             start = pixel_location(curr)
-            for key2 in self.graph.nodes[key]:
-                next = self.info[key2]
-                end = pixel_location(next)
-                cv2.line(img, start, end, color=(255,0,0), thickness=1)
+            next = self.info[key2]
+            end = pixel_location(next)
+            cv2.line(img, start, end, color=(255,0,0), thickness=1)
 
         cv2.imshow('world', img)
         cv2.waitKey(0)
@@ -162,3 +196,4 @@ if __name__ == '__main__':
     W = World('../input_files/hw4_world_and_obstacles_convex.txt', '../input_files/hw4_start_goal.txt')
     #W = World('../input_files/small_world.txt', '../input_files/hw4_start_goal.txt')
     W.draw(grown=True)
+    print W.path
