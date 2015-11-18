@@ -24,9 +24,11 @@ class Graph():
         self.nodes[a][b] = weight
         self.nodes[b][a] = weight
 
-    def shortest_path(self, source):
-        pass
-
+    def shortest_path(self, source, dest):
+        visited = set()
+        queue = [source]
+        visited.add(source)
+        dist = 0
 
 class World(object):
 

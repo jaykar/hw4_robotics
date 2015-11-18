@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
+import find_convex_hull
 
 class Line(object):
     def __init__(self, start, end):
@@ -139,13 +140,15 @@ class Obstacle(object):
             coords.append([x-square, y+square])
             coords.append([x-square, y-square])
         
-        coords = np.array(coords) 
-        hull = ConvexHull(coords)
-        x = coords[hull.vertices,0]
-        y = coords[hull.vertices,1]
-        coords = []
-        for (a, b) in zip(x,y):
-            coords.append([a,b])
+        coords = find_convex_hull(coords)
+
+        #coords = np.array(coords) 
+        #hull = ConvexHull(coords)
+        #x = coords[hull.vertices,0]
+        #y = coords[hull.vertices,1]
+        #coords = []
+        #for (a, b) in zip(x,y):
+        #coords.append([a,b])
         return coords
     
     def draw(self, grown=False, size=(600, 900, 3), thickness=1, color =(0, 0, 255)):
