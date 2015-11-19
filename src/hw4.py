@@ -490,7 +490,7 @@ class World(object):
         f.close()
 
 if __name__ == '__main__':
-    W = World('../input_files/hw4_world_and_obstacles_convex.txt', '../input_files/hw4_start_goal.txt')
+    W = World('hw4_world_and_obstacles_convex.txt', 'hw4_start_goal.txt')
     #W = World('../input_files/small_world.txt', '../input_files/hw4_start_goal.txt')
     W.draw(grown=True)
     W.output_path('output.txt')

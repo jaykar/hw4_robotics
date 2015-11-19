@@ -13,6 +13,7 @@ pip install numpy
 To run our program, type:
 python hw4.py
 
+The input files for the world should be in a txt file in input_files called 
 Press any key to quit out of the final image.
 
 We implemented our own convex hull and dijkstra's function
