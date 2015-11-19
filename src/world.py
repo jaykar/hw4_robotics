@@ -27,7 +27,11 @@ class Graph():
     def shortest_path(self):
         s = 'start'
         e = 'end'
-        return self.djikstra(self.nodes, s, e)
+        ans = self.djikstra(self.nodes, s, e)
+        if len(ans) != 0:
+            return ans
+        else:
+            return "no path"
 
     def djikstra(self, nodes, S, G):
         #nodes = graph.nodes
@@ -189,6 +193,8 @@ class World(object):
         end =  pixel_location(self.goals[1])
         cv2.circle(img, start, radius = 5, color=(0,0,255)) 
         cv2.circle(img, end, radius = 5, color=(0,255,0)) 
+
+        cv2.imwrite("map.png", img)
         #cv2.imshow('world', img)
         #cv2.waitKey(0)
 
@@ -198,9 +204,8 @@ class World(object):
                 img += obstacle.draw(True, size,thickness, color=(0, 255, 0))
             img += obstacle.draw(False, size,thickness)
 
-        img2 = np.copy(img)
-        cv2.imshow('world', img)
-        cv2.waitKey(0)
+        
+        cv2.imwrite("map_grown_obstacle.png", img)
 
         for key in self.graph.nodes:
            curr = self.info[key]
@@ -209,8 +214,9 @@ class World(object):
                next = self.info[key2]
                end = pixel_location(next)
                cv2.line(img, start, end, color=(255,0,0), thickness=1)
-        cv2.imshow('world', img)
-        cv2.waitKey(0)
+        #cv2.imshow('world', img)
+        #cv2.waitKey(0)
+        cv2.imwrite("map_all_path.png", img)
 
         path = self.path
         for i in range(len(path) -1):
@@ -219,9 +225,10 @@ class World(object):
             start = pixel_location(curr)
             next = self.info[key2]
             end = pixel_location(next)
-            cv2.line(img2, start, end, color=(255,0,0), thickness=1)
+            cv2.line(img, start, end, color=(255,255,0), thickness=1)
 
-        cv2.imshow('world', img2)
+        cv2.imwrite("map_valid_path.png", img)
+        cv2.imshow('world', img)
         cv2.waitKey(0)
 
     def _print(self):
