@@ -77,7 +77,7 @@ class World(object):
         self.make_edges()
         self.path = ['start']
         self.path.extend(self.graph.shortest_path())
-        #self.get_matlab_instructions('1')
+        self.get_matlab_instructions('1')
     def position_nodes(self, coord):
         x, y = coord
         a = np.eye(4)
@@ -102,9 +102,9 @@ class World(object):
             x0, y0 = curr
             next = self.info[ self.path[i+1] ]
             x1, y1 = next
-            theta = np.arctan2(y1 - y0, x1 - x0) - prev_angle
+            theta = np.arctan2(y1 - y0, x1 - x0) #- prev_angle
             prev_angle = theta
-            print "rotate", (theta - (np.pi/2))*180/np.pi
+            print "rotate", 90 - (theta - (np.pi/2))*180/np.pi
             print "move", np.sqrt((y1 - y0)**2 + (x1 - x0)**2 )
 
     def intialize_graph(self):
@@ -182,21 +182,35 @@ class World(object):
         for i, obstacle in enumerate(self.obstacles):
             if i > 0:
                 thickness = 1
-                img += obstacle.draw(grown, size,thickness, color=(0, 255, 0))
+                img += obstacle.draw(False, size,thickness, color=(0, 255, 0))
             img += obstacle.draw(False, size,thickness)
 
         start =  pixel_location(self.goals[0])
         end =  pixel_location(self.goals[1])
         cv2.circle(img, start, radius = 5, color=(0,0,255)) 
         cv2.circle(img, end, radius = 5, color=(0,255,0)) 
+        #cv2.imshow('world', img)
+        #cv2.waitKey(0)
 
-        #for key in self.graph.nodes:
-        #    curr = self.info[key]
-        #    start = pixel_location(curr)
-        #    for key2 in self.graph.nodes[key]:
-        #        next = self.info[key2]
-        #        end = pixel_location(next)
-        #        cv2.line(img, start, end, color=(255,0,0), thickness=1)
+        for i, obstacle in enumerate(self.obstacles):
+            if i > 0:
+                thickness = 1
+                img += obstacle.draw(True, size,thickness, color=(0, 255, 0))
+            img += obstacle.draw(False, size,thickness)
+
+        img2 = np.copy(img)
+        cv2.imshow('world', img)
+        cv2.waitKey(0)
+
+        for key in self.graph.nodes:
+           curr = self.info[key]
+           start = pixel_location(curr)
+           for key2 in self.graph.nodes[key]:
+               next = self.info[key2]
+               end = pixel_location(next)
+               cv2.line(img, start, end, color=(255,0,0), thickness=1)
+        cv2.imshow('world', img)
+        cv2.waitKey(0)
 
         path = self.path
         for i in range(len(path) -1):
@@ -205,9 +219,9 @@ class World(object):
             start = pixel_location(curr)
             next = self.info[key2]
             end = pixel_location(next)
-            cv2.line(img, start, end, color=(255,0,0), thickness=1)
+            cv2.line(img2, start, end, color=(255,0,0), thickness=1)
 
-        cv2.imshow('world', img)
+        cv2.imshow('world', img2)
         cv2.waitKey(0)
 
     def _print(self):

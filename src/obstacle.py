@@ -14,7 +14,6 @@ def find_convex_hull(pts_array):
     # find the rightmost, lowest point, label it P0
     sorted_pts = sorted(pts_array, key=lambda element: (element[0], -element[1]))
     P0 = sorted_pts.pop()
-    print(P0)
     P0_x = P0[0]
     P0_y = P0[1]
     
@@ -35,7 +34,6 @@ def find_convex_hull(pts_array):
         pt_info = (round(angle, 3), round(dist,3), pts_array[i])
         sort_array.append(pt_info)
     sorted_pts = sorted(sort_array, key=lambda element: (element[0], element[1]))
-    print(sorted_pts)
     # Push the points labeled PN−1 and P0 onto a stack. T
     # these points are guaranteed to be on the Convex Hull
     pt_stack = []
