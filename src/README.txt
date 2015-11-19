@@ -8,10 +8,10 @@ We implemented our code in Python 2.7.4. Before running our
 program please ensure you run the following:
 brew tap homebrew/science
 brew install opencv
-pipinstall numpy
+pip install numpy
 
 To run our program, type:
-python world.py
+python hw4.py
 
 Press any key to quit out of the final image.
 

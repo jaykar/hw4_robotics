@@ -487,7 +487,7 @@ class World(object):
             x, y = coord
             #position = "X pos: " + str(x) + " Y pos: " + str(y) + "\n"
             f.write(str(x) + ' '+ str(y) + '\n')
-        f.close(f)
+        f.close()
 
 if __name__ == '__main__':
     W = World('../input_files/hw4_world_and_obstacles_convex.txt', '../input_files/hw4_start_goal.txt')
